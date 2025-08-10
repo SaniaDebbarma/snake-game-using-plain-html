@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game - Plain HTML</title>
+    <link rel="stylesheet" href="game.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="background-image: url('background_snake.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div id="app">
+        <!-- Game Container -->
+        <div class="game-container">
+            <!-- Game HUD -->
+            <div class="game-hud">
+                <!-- Top HUD -->
+                <div class="hud-top">
+                    <!-- Left: Scores -->
+                    <div class="scores-section">
+                        <div class="score-item">
+                            <div class="score-value" id="current-score">0</div>
+                            <div class="score-label">Score</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value secondary" id="high-score">0</div>
+                            <div class="score-label">Best</div>
+                        </div>
+                        <div class="speed-badge" id="speed-indicator" style="display: none;">
+                            <span id="speed-text">NORMAL</span>
+                        </div>
+                    </div>
+
+                    <!-- Center: Title -->
+                    <div class="title-section">
+                        <h1 class="game-title">Snake Game</h1>
+                        <div class="game-status" id="game-status">Ready</div>
+                    </div>
+
+                    <!-- Right: Action Buttons -->
+                    <div class="action-buttons">
+                        <button id="start-btn" class="btn btn-primary">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5,3 19,12 5,21"></polygon>
+                            </svg>
+                            Start
+                        </button>
+                        <button id="pause-btn" class="btn btn-secondary" style="display: none;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="4" width="4" height="16"></rect>
+                                <rect x="14" y="4" width="4" height="16"></rect>
+                            </svg>
+                        </button>
+                        <button id="resume-btn" class="btn btn-primary" style="display: none;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5,3 19,12 5,21"></polygon>
+                            </svg>
+                            Resume
+                        </button>
+                        <button id="restart-btn" class="btn btn-outline" style="display: none;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                                <path d="M21 3v5h-5"></path>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                                <path d="M3 21v-5h5"></path>
+                            </svg>
+                        </button>
+                        <button id="settings-btn" class="btn btn-ghost">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6"></path>
+                                <path d="M12 17v6"></path>
+                                <path d="M4.22 4.22l4.24 4.24"></path>
+                                <path d="M15.54 15.54l4.24 4.24"></path>
+                                <path d="M1 12h6"></path>
+                                <path d="M17 12h6"></path>
+                                <path d="M4.22 19.78l4.24-4.24"></path>
+                                <path d="M15.54 8.46l4.24-4.24"></path>
+                            </svg>
+                        </button>
+                        <button id="share-btn" class="btn btn-ghost" style="display: none;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                <polyline points="16,6 12,2 8,6"></polyline>
+                                <line x1="12" y1="2" x2="12" y2="15"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bottom: Controls and Settings -->
+                <div class="hud-bottom">
+                    <!-- Difficulty Selector -->
+                    <div class="control-group">
+                        <label for="difficulty-select">Difficulty:</label>
+                        <select id="difficulty-select" class="select">
+                            <option value="EASY">Easy</option>
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="HARD">Hard</option>
+                        </select>
+                    </div>
+
+                    <!-- Game Instructions -->
+                    <div class="instructions">
+                        Use arrow keys or WASD to move • Eat food to grow • Avoid walls and yourself
+                    </div>
+
+                    <!-- Wrap Mode Toggle -->
+                    <div class="control-group">
+                        <label for="wrap-mode">Wrap Mode:</label>
+                        <label class="switch">
+                            <input type="checkbox" id="wrap-mode">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Board -->
+            <div class="game-board-container">
+                <canvas id="game-canvas" class="game-canvas" style="background-color: black;"></canvas>
+                <div id="countdown-overlay" class="countdown-overlay" style="display: none;">
+                    <div class="countdown-number" id="countdown-number">3</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div id="mobile-controls" class="mobile-controls" style="display: none;">
+            <!-- D-Pad Controls -->
+            <div class="dpad-container">
+                <div class="dpad">
+                    <button class="dpad-btn dpad-up" data-direction="UP">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="18,15 12,9 6,15"></polyline>
+                        </svg>
+                    </button>
+                    <button class="dpad-btn dpad-down" data-direction="DOWN">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </button>
+                    <button class="dpad-btn dpad-left" data-direction="LEFT">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15,18 9,12 15,6"></polyline>
+                        </svg>
+                    </button>
+                    <button class="dpad-btn dpad-right" data-direction="RIGHT">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9,18 15,12 9,6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Swipe Area -->
+            <div class="swipe-area" id="swipe-area">
+                <div class="swipe-text">Swipe<br>to move</div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="game-over-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="modal-title">
+                        <svg class="icon trophy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                            <path d="M4 22h16"></path>
+                            <path d="M10 14.66V17c0 .55.47.98.97 1.21C11.85 18.75 12 19.24 12 20"></path>
+                            <path d="M14 14.66V17c0 .55-.47.98-.97 1.21C12.15 18.75 12 19.24 12 20"></path>
+                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                        </svg>
+                        <span id="modal-title-text">Game Over</span>
+                    </div>
+                    <div class="modal-description" id="modal-description">
+                        Better luck next time! Keep practicing to improve your score.
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Score Display -->
+                    <div class="score-display">
+                        <div class="final-score" id="final-score">0</div>
+                        <div class="score-rating" id="score-rating">Try again!</div>
+                        <div class="high-score-text" id="high-score-text" style="display: none;">
+                            High Score: <span id="modal-high-score">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="modal-actions">
+                        <button id="play-again-btn" class="btn btn-primary">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                                <path d="M21 3v5h-5"></path>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                                <path d="M3 21v-5h5"></path>
+                            </svg>
+                            Play Again
+                        </button>
+                        <button id="modal-share-btn" class="btn btn-outline">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                <polyline points="16,6 12,2 8,6"></polyline>
+                                <line x1="12" y1="2" x2="12" y2="15"></line>
+                            </svg>
+                            Share Score
+                        </button>
+                    </div>
+
+                    <!-- Pro Tips -->
+                    <div class="pro-tips">
+                        <div class="tips-title">Pro Tips:</div>
+                        <div class="tips-list">
+                            <div>• Plan your moves ahead</div>
+                            <div>• Use the edges strategically</div>
+                            <div>• Don't rush - speed increases automatically</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
