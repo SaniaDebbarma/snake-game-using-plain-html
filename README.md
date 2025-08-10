@@ -29,7 +29,7 @@ A modern twist on the classic Snake Game, built entirely using HTML, CSS, and va
 ## 🚀 Getting Started
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/snakely.git
+   git clone https://github.com/SaniaDebbarma/snake-game-using-plain-html/tree/main
 
    	2.	Open index.html in your favorite browser.
 	3.	Play and have fun!
